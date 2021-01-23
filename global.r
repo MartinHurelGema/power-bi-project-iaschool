@@ -39,6 +39,61 @@ clean_data <- function(){
   #feed_sum/(sum(Cereal_consumption$Food,na.rm = TRUE)+feed_sum)
   
   
+   
+  
+  populations <- population_table %>% select(`Area Code`,Year,Value)
+  populations$Value <- populations$Value*1000
+  #merge population with main table
+  pivot_new <- left_join(x=pivoted_table,y=populations,by="Area Code","Year")
+  pivot_new <- pivot_new[!pivot_new$`Area Code` %in% c(41,96,214,128),]
+ 
+  
+  pivot<- pivot_new[( (pivot_new$Food > 0)  & (pivot_new$`Food supply quantity (kg/capita/yr)` != 0)  & (pivot_new$`Food supply (kcal/capita/day)` != 0) & !is.na(pivot_new$`Food supply (kcal/capita/day)`) & (!is.na(pivot_new$`Food supply quantity (kg/capita/yr)`)) ),]
+  
+  pivot <-pivot %>% mutate(kg_capita_day = pivot$`Food supply quantity (kg/capita/yr)`/365 )
+  pivot <- pivot %>% mutate(kcal_for_kg= pivot$`Food supply (kcal/capita/day)`/pivot$kg_capita_day)
+  
+  
+  # les plus caloriques
+  
+  calories <- pivot %>% group_by(Item,`Item Code`,Area)  %>% summarise(cal = mean(kcal_for_kg))
+  cal <- calories %>% filter(cal < 10000) %>% group_by(Item) %>% summarise(cal = mean(cal))
+  pivot <-left_join(x=pivot,y=cal,by="Item")
+  pivot$kcal_for_kg <- NULL
+  
+  #rename columns 
+  names(pivot)[names(pivot) == "cal"] <- "calories_kg"
+  names(pivot)[names(pivot) == "Value"] <- "population_size"
+  
+  
+  
+  
+  # les plus protéinés
+  
+  prot <- pivot %>% group_by(Item,Area) %>% summarise(protein_ratio = `Protein supply quantity (g/capita/day)`/(kg_capita_day*1000) )
+  prot <- prot %>% filter(protein_ratio < .42)
+  prot <- prot %>% group_by(Item) %>% summarise(protein_ratio = mean(protein_ratio)) %>% arrange(desc(protein_ratio))
+  
+  pivot <- left_join(x=pivot,y=prot,by="Item")
+  pivot$Year.y <- NULL
+  
+  
+  
+  # disponibilité mondiale en végéteaux
+  dispos_veggies <- pivot %>% filter(origin == "vegetal") %>% group_by(Year.x)  %>% summarise(dispo_protein = sum(protein_ratio) ,dispo_cal=sum(calories_kg))
+  
+  ppl_year <- population_table %>% group_by(Year) %>% summarise(avg = sum(Value))
+  
+  names(dispos_veggies)[names(dispos_veggies) == "Year.x"] <- "Year"
+  only_veggies_ratio <- left_join(x=dispos_veggies,y=ppl_year, by="Year" )
+  names(only_veggies_ratio)[names(only_veggies_ratio) == "avg"] <- "population"
+  
+  only_veggies_ratio <- only_veggies_ratio %>% mutate(kcal_on_veggies_capita = only_veggies_ratio$dispo_cal/only_veggies_ratio$population)
+  only_veggies_ratio <- only_veggies_ratio %>% mutate(protein_from_veggies_capita=only_veggies_ratio$dispo_protein/only_veggies_ratio$population)
+  
+  #no waste
+  pivot <- pivot %>% mutate(all_to_food=Food+Feed+Losses)
+  
   
   
   
