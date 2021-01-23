@@ -1,7 +1,7 @@
 # Taille de la population mondiale
 populationMondiale <<- function(){
-  pop <- population %>% subset(`Area Code` != 351 ) %>%  group_by(Year)%>%summarise(s = sum(population_value))
-  return(pop)
+  evo_poppulation <- population_table %>% group_by(Year) %>% summarise(n = sum(Value))
+  return(evo_poppulation)
 }
 
 alimentation_proportion <<- function(...){
@@ -10,7 +10,6 @@ alimentation_proportion <<- function(...){
     arrange(desc(n)) %>%
     mutate(lab.ypos = cumsum(n) - 0.5*n)
   
-  prop <- prop %>% mutate(percent = round((n * 100 )/sum(prop$n),digits=0) )
+  prop <- prop %>% mutate(percent = round((n * sum(prop$n) )/1000,digits=0) )
   return(prop)
 }
-

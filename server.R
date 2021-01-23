@@ -18,6 +18,7 @@ library(RMySQL)
 library(RODBC)
 library(tidyverse)
 library(scales)
+library(DT)
 
 # Define server logic required to draw a histogram
 
@@ -42,6 +43,29 @@ shinyServer(function(input, output) {
             theme_void()+
             ggtitle('Proportion des céréales pour l’alimentation animale')
     })
+    output$tbl = renderTable({data <- disp_alim_per_item %>% select(`Fat supply quantity (g/capita/day)`,
+                                                                    `Food supply (kcal/capita/day)`,
+                                                                    `Food supply quantity (kg/capita/yr)`,
+                                                                    `Protein supply quantity (g/capita/day)`) %>% 
+        summary() %>% as.data.frame.matrix()} )
+    # if("Area" %in% output$Area){
+    #     output$tbl = renderTable({data <- disp_alim_per_item %>% select(`Fat supply quantity (g/capita/day)`,
+    #                                                                     `Food supply (kcal/capita/day)`,
+    #                                                                     `Food supply quantity (kg/capita/yr)`,
+    #                                                                     `Protein supply quantity (g/capita/day)`) %>% 
+    #         summary() %>% as.data.frame.matrix()} )
+    #     
+    # }
+    # else{
+    #     output$tbl = renderTable({data <- disp_alim_per_item %>% filter(Area %in% output$Area) %>% select(`Fat supply quantity (g/capita/day)`,
+    #                                                                     `Food supply (kcal/capita/day)`,
+    #                                                                     `Food supply quantity (kg/capita/yr)`,
+    #                                                                     `Protein supply quantity (g/capita/day)`) %>% 
+    #         summary() %>% as.data.frame.matrix()} )
+    #     
+    # }
+    # 
+    
     onSessionEnded(function(){
         stop_connection()    
     })

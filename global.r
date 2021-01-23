@@ -3,8 +3,8 @@ library(readr)
 library(odbc)
 library(RMySQL)
 library(RODBC)
+library(tidyr)
 
-# test test
 importData <<- function(){
     setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
     # importing dataFrames
@@ -16,6 +16,31 @@ importData <<- function(){
     }
 
 clean_data <- function(){
+  # création de la table pivot
+  vegetal$origin="vegetal"
+  animal$origin="animal"
+  All_products <<- rbind(vegetal,animal)
+  
+  # population mondiale
+  population_table_tmp <- population[!population$`Area Code` %in% c(41,96,214,128),] 
+  population_table <<- population_table_tmp %>% select(Area,`Area Code`,Value,Year)
+  population_table$Value <- population_table$Value*1000
+  
+  products <- All_products[,!names(All_products) %in% c("Domain Code","Domain")]
+  pivoted_table <- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
+  
+  cereals <- cereals[,!names(cereals) %in% c("Domain Code","Domain")]
+  codes <- cereals %>% distinct(`Item Code`)
+  pivoted_table <- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes))
+  
+  
+  Cereal_consumption <- pivoted_table %>% filter(is_cereal == TRUE)
+  feed_sum <- sum(Cereal_consumption$Feed,na.rm = TRUE)
+  #feed_sum/(sum(Cereal_consumption$Food,na.rm = TRUE)+feed_sum)
+  
+  
+  
+  
   population <<- population %>% mutate(population_value = Value*strtoi(gsub("[^0-9.]","", Unit))/1000000000)
   
   dispo_alim <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
@@ -40,14 +65,19 @@ clean_data <- function(){
   
   #Proportion des céréales pour l’alimentation animale
   alimentation_proportion  <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>%
-            filter (Element %in% c('Feed','Food')) %>% group_by(Element) %>% summarise(n = n()) %>% 
+            filter (Element %in% c('Feed','Food')) %>% group_by(Element) %>% summarise(n = sum(Value)) %>% 
             arrange(desc(n)) %>%
             mutate(lab.ypos = cumsum(n) - 0.5*n)
             
   alimentation_proportion <<- alimentation_proportion %>% mutate(percent = round((n * 100 )/sum(alimentation_proportion$n),digits=0) )
     
   # Calculer (pour chaque pays et chaque produit) la disponibilité alimentaire en kcal puis en kg de protéines 
-  disp_alim_per_item <- dispo_alim %>% inner_join(population %>% select(c("Year","Area Code","Value")) ,by=c("Year","Area Code"))
+  disp_alim_per_item <<- dispo_alim %>% inner_join(population %>% select(c("Year","Area Code","Value")) ,by=c("Year","Area Code"))
+  
+  # afficher le  10 des pays qui ont la meuilleur disponibilité alimentaire
+  
+  
+  # afficher les 10 pays qui ont la pire disponibilitée alimentaire 
   
   }
 dataBaseConnect <<- function(driver,server,database,usr,pwd,port){

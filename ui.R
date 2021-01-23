@@ -24,12 +24,24 @@ shinyUI(fluidPage(
                             )),
                    tabPanel("Alimentation",
                             h1('Analyse de la disponibilitée alimentaire'),
+                            h1('Proportion des céréales pour l’alimentation animale'),
                             sidebarLayout(
-                                sidebarPanel = NULL,
+                                
+                                sidebarPanel = selectInput("Area", "Area",
+                                                           choices = 
+                                                               c("All", as.vector(disp_alim_per_item %>% select(Area) %>% distinct()) ),multiple = TRUE),
                                 mainPanel = mainPanel(
                                     plotOutput('PieChart')
                                 )    
-                            )),
+                            ),
+                            h1('chifres clés du dataset pour la disponibilitée alimentaire par item et par pays'),
+                            sidebarLayout(
+                                sidebarPanel = selectInput("Area", "Area",
+                                                           choices = 
+                                                               c("All", as.vector(disp_alim_per_item %>% select(Area) %>% distinct()) ),multiple = TRUE),
+                                mainPanel = tableOutput('tbl')
+                            )
+                            ),
                    tabPanel("tab 3",img(src="www/cute_cats.jpg")),
                    tabPanel("tab 4",img(src="www/funny_cats.jpg"))
         )
