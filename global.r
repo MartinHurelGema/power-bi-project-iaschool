@@ -41,43 +41,44 @@ clean_data <- function(){
   
   
   
-  population <<- population %>% mutate(population_value = Value*strtoi(gsub("[^0-9.]","", Unit))/1000000000)
   
-  dispo_alim <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
-                
-                select(`Item Code`,Item,`Area Code`,Area,Value,Year,Element,origin) %>% 
-                  
-                filter(Element %in% c(
-                  'Food supply quantity (kg/capita/yr)',
-                  'Food supply (kcal/capita/day)',
-                  'Protein supply quantity (g/capita/day)',
-                  'Fat supply quantity (g/capita/day)')) %>% 
-                
-                spread(key = Element,value = Value)
-              
-                
-  cereals_list <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
-        select(`Item Code`,Item,`Area Code`,Area,Year,origin) %>%  
-        mutate(is_cereal = ifelse(test = `Item Code` %in% c(2511,2805,2513,2514,2517,2520,2515,2516,2518),
-                              yes = TRUE,
-                              no = FALSE) )
-  
-  
-  #Proportion des céréales pour l’alimentation animale
-  alimentation_proportion  <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>%
-            filter (Element %in% c('Feed','Food')) %>% group_by(Element) %>% summarise(n = sum(Value)) %>% 
-            arrange(desc(n)) %>%
-            mutate(lab.ypos = cumsum(n) - 0.5*n)
-            
-  alimentation_proportion <<- alimentation_proportion %>% mutate(percent = round((n * 100 )/sum(alimentation_proportion$n),digits=0) )
-    
-  # Calculer (pour chaque pays et chaque produit) la disponibilité alimentaire en kcal puis en kg de protéines 
-  disp_alim_per_item <<- dispo_alim %>% inner_join(population %>% select(c("Year","Area Code","Value")) ,by=c("Year","Area Code"))
-  
-  # afficher le  10 des pays qui ont la meuilleur disponibilité alimentaire
-  
-  
-  # afficher les 10 pays qui ont la pire disponibilitée alimentaire 
+  # population <<- population %>% mutate(population_value = Value*strtoi(gsub("[^0-9.]","", Unit))/1000000000)
+  # 
+  # dispo_alim <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
+  #               
+  #               select(`Item Code`,Item,`Area Code`,Area,Value,Year,Element,origin) %>% 
+  #                 
+  #               filter(Element %in% c(
+  #                 'Food supply quantity (kg/capita/yr)',
+  #                 'Food supply (kcal/capita/day)',
+  #                 'Protein supply quantity (g/capita/day)',
+  #                 'Fat supply quantity (g/capita/day)')) %>% 
+  #               
+  #               spread(key = Element,value = Value)
+  #             
+  #               
+  # cereals_list <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
+  #       select(`Item Code`,Item,`Area Code`,Area,Year,origin) %>%  
+  #       mutate(is_cereal = ifelse(test = `Item Code` %in% c(2511,2805,2513,2514,2517,2520,2515,2516,2518),
+  #                             yes = TRUE,
+  #                             no = FALSE) )
+  # 
+  # 
+  # #Proportion des céréales pour l’alimentation animale
+  # alimentation_proportion  <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>%
+  #           filter (Element %in% c('Feed','Food')) %>% group_by(Element) %>% summarise(n = sum(Value)) %>% 
+  #           arrange(desc(n)) %>%
+  #           mutate(lab.ypos = cumsum(n) - 0.5*n)
+  #           
+  # alimentation_proportion <<- alimentation_proportion %>% mutate(percent = round((n * 100 )/sum(alimentation_proportion$n),digits=0) )
+  #   
+  # # Calculer (pour chaque pays et chaque produit) la disponibilité alimentaire en kcal puis en kg de protéines 
+  # disp_alim_per_item <<- dispo_alim %>% inner_join(population %>% select(c("Year","Area Code","Value")) ,by=c("Year","Area Code"))
+  # 
+  # # afficher le  10 des pays qui ont la meuilleur disponibilité alimentaire
+  # 
+  # 
+  # # afficher les 10 pays qui ont la pire disponibilitée alimentaire 
   
   }
 dataBaseConnect <<- function(driver,server,database,usr,pwd,port){

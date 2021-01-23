@@ -35,19 +35,19 @@ shinyServer(function(input, output) {
                  y = "poppulation (billion) " # y axis label
             )
     })
-    output$PieChart <- renderPlot({
-        ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) + 
-            geom_bar(width = 1, stat = "identity", color = "white") +
-            coord_polar("y", start = 0)+
-            geom_text(aes(y=lab.ypos,label = percent(percent,scale = 1)), color = "white")+
-            theme_void()+
-            ggtitle('Proportion des céréales pour l’alimentation animale')
-    })
-    output$tbl = renderTable({data <- disp_alim_per_item %>% select(`Fat supply quantity (g/capita/day)`,
-                                                                    `Food supply (kcal/capita/day)`,
-                                                                    `Food supply quantity (kg/capita/yr)`,
-                                                                    `Protein supply quantity (g/capita/day)`) %>% 
-        summary() %>% as.data.frame.matrix()} )
+    # output$PieChart <- renderPlot({
+    #     ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) + 
+    #         geom_bar(width = 1, stat = "identity", color = "white") +
+    #         coord_polar("y", start = 0)+
+    #         geom_text(aes(y=lab.ypos,label = percent(percent,scale = 1)), color = "white")+
+    #         theme_void()+
+    #         ggtitle('Proportion des céréales pour l’alimentation animale')
+    # })
+    # output$tbl = renderTable({data <- disp_alim_per_item %>% select(`Fat supply quantity (g/capita/day)`,
+    #                                                                 `Food supply (kcal/capita/day)`,
+    #                                                                 `Food supply quantity (kg/capita/yr)`,
+    #                                                                 `Protein supply quantity (g/capita/day)`) %>% 
+    #     summary() %>% as.data.frame.matrix()} )
     # if("Area" %in% output$Area){
     #     output$tbl = renderTable({data <- disp_alim_per_item %>% select(`Fat supply quantity (g/capita/day)`,
     #                                                                     `Food supply (kcal/capita/day)`,
