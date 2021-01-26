@@ -28,18 +28,28 @@ shinyUI(fluidPage(
                             sidebarLayout(
                                 
                                 sidebarPanel = selectInput("Area", "Area",
-                                                           choices = 
-                                                               c("All", as.vector(disp_alim_per_item %>% select(Area) %>% distinct()) ),multiple = TRUE),
+                                                               c("All", as.vector(disp_alim_per_item %>% select(Area) %>% distinct()) ),multiple = FALSE),
+                                
                                 mainPanel = mainPanel(
-                                    plotOutput('PieChart')
+                                    tableOutput("Table1")
                                 )    
+                                
                             ),
-                            h1('chifres clés du dataset pour la disponibilitée alimentaire par item et par pays'),
+                            
+                            h1('Proportion (en termes de poids) est destinée à lalimentation animale'),
                             sidebarLayout(
-                                sidebarPanel = selectInput("Area", "Area",
-                                                           choices = 
-                                                               c("All", as.vector(disp_alim_per_item %>% select(Area) %>% distinct()) ),multiple = TRUE),
-                                mainPanel = tableOutput('tbl')
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table2")
+                                )    
+                                
+                            ),
+        
+                            h1('Chiffres clés du dataset pour la disponibilitée alimentaire par item et par pays'),
+                            sidebarLayout(
+                                sidebarPanel = NULL,
+                                mainPanel = tableOutput("Table3")
                             )
                             ),
                    tabPanel("tab 3",img(src="www/cute_cats.jpg")),

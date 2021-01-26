@@ -19,7 +19,8 @@ library(RODBC)
 library(tidyverse)
 library(scales)
 library(DT)
-
+library(gridExtra)
+library(grid)
 # Define server logic required to draw a histogram
 
 
@@ -28,13 +29,29 @@ shinyServer(function(input, output) {
     
     
     output$LinePlot1 <- renderPlot({
-        ggplot(data = populationMondiale(), aes(x = Year, y = s))+
+        ggplot(data = populationMondiale(), aes(x = Year, y = n))+
             geom_line()+
             labs(title = "évolution de la poppulation mondiale de 2014 a 2017", # plot title
                  x = "dates", # x axis label
                  y = "poppulation (billion) " # y axis label
             )
     })
+    
+    output$Table1 <- renderTable(
+        #print(input$Area)
+        #print(dispo_alimentaion(input$Area))
+        #ggplot(data = dispo_alimentaion(input$Area))
+        cereals_list_verify(input$Area)
+    )
+    
+    output$Table2 <- renderTable(
+        Cereal_consumption
+    )
+    
+    output$Table3 <- renderTable(
+        disp_alim_per_item_fct()
+    )
+    
     # output$PieChart <- renderPlot({
     #     ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) + 
     #         geom_bar(width = 1, stat = "identity", color = "white") +
