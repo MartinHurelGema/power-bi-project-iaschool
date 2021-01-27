@@ -27,16 +27,22 @@ clean_data <- function(){
   population_table$Value <- population_table$Value*1000
   
   products <- All_products[,!names(All_products) %in% c("Domain Code","Domain")]
+  
+  #pivoted = partout !!!! 
   pivoted_table <- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
   
   cereals <- cereals[,!names(cereals) %in% c("Domain Code","Domain")]
-  codes <- cereals %>% distinct(`Item Code`)
+  codes <- cereals %>% distinct(`Item Code`) 
+  
+  #2.1.1 & 2.2.1
   pivoted_table <- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes))
   
   
-  Cereal_consumption <- pivoted_table %>% filter(is_cereal == TRUE)
+  #2.1.1
+  Cereal_consumption <<- pivoted_table %>% filter(is_cereal == TRUE)
   feed_sum <- sum(Cereal_consumption$Feed,na.rm = TRUE)
-  #feed_sum/(sum(Cereal_consumption$Food,na.rm = TRUE)+feed_sum)
+  #2.1.2
+  Cereal_percent <- feed_sum/(sum(Cereal_consumption$Food,na.rm = TRUE)+feed_sum)
   
   
    
@@ -48,15 +54,16 @@ clean_data <- function(){
   pivot_new <- pivot_new[!pivot_new$`Area Code` %in% c(41,96,214,128),]
  
   
-  pivot<- pivot_new[( (pivot_new$Food > 0)  & (pivot_new$`Food supply quantity (kg/capita/yr)` != 0)  & (pivot_new$`Food supply (kcal/capita/day)` != 0) & !is.na(pivot_new$`Food supply (kcal/capita/day)`) & (!is.na(pivot_new$`Food supply quantity (kg/capita/yr)`)) ),]
+  pivot <- pivot_new[( (pivot_new$Food > 0)  & (pivot_new$`Food supply quantity (kg/capita/yr)` != 0)  & (pivot_new$`Food supply (kcal/capita/day)` != 0) & !is.na(pivot_new$`Food supply (kcal/capita/day)`) & (!is.na(pivot_new$`Food supply quantity (kg/capita/yr)`)) ),]
   
-  pivot <-pivot %>% mutate(kg_capita_day = pivot$`Food supply quantity (kg/capita/yr)`/365 )
+  pivot <- pivot %>% mutate(kg_capita_day = pivot$`Food supply quantity (kg/capita/yr)`/365 )
   pivot <- pivot %>% mutate(kcal_for_kg= pivot$`Food supply (kcal/capita/day)`/pivot$kg_capita_day)
   
   
   # les plus caloriques
-  
+  #2.3.1
   calories <- pivot %>% group_by(Item,`Item Code`,Area)  %>% summarise(cal = mean(kcal_for_kg))
+  #2.2.2
   cal <- calories %>% filter(cal < 10000) %>% group_by(Item) %>% summarise(cal = mean(cal))
   pivot <-left_join(x=pivot,y=cal,by="Item")
   pivot$kcal_for_kg <- NULL
@@ -69,18 +76,18 @@ clean_data <- function(){
   
   
   # les plus protéinés
-  
+  #2.2.3
   prot <- pivot %>% group_by(Item,Area) %>% summarise(protein_ratio = `Protein supply quantity (g/capita/day)`/(kg_capita_day*1000) )
   prot <- prot %>% filter(protein_ratio < .42)
   prot <- prot %>% group_by(Item) %>% summarise(protein_ratio = mean(protein_ratio)) %>% arrange(desc(protein_ratio))
   
   pivot <- left_join(x=pivot,y=prot,by="Item")
   pivot$Year.y <- NULL
-  
-  
+  pivot$protein_ratio.y <- NULL
   
   # disponibilité mondiale en végéteaux
-  dispos_veggies <- pivot %>% filter(origin == "vegetal") %>% group_by(Year.x)  %>% summarise(dispo_protein = sum(protein_ratio) ,dispo_cal=sum(calories_kg))
+  #2.4.1
+  dispos_veggies <<- pivot %>% filter(origin == "vegetal") %>% group_by(Year.x)  %>% summarise(dispo_protein = sum(Food*1000000*protein_ratio) ,dispo_cal=sum(Food*1000000*calories_kg))
   
   ppl_year <- population_table %>% group_by(Year) %>% summarise(avg = sum(Value))
   
@@ -88,10 +95,12 @@ clean_data <- function(){
   only_veggies_ratio <- left_join(x=dispos_veggies,y=ppl_year, by="Year" )
   names(only_veggies_ratio)[names(only_veggies_ratio) == "avg"] <- "population"
   
+  #2.4.2 + calcul à faire
   only_veggies_ratio <- only_veggies_ratio %>% mutate(kcal_on_veggies_capita = only_veggies_ratio$dispo_cal/only_veggies_ratio$population)
-  only_veggies_ratio <- only_veggies_ratio %>% mutate(protein_from_veggies_capita=only_veggies_ratio$dispo_protein/only_veggies_ratio$population)
+  only_veggies_ratio <<- only_veggies_ratio %>% mutate(protein_from_veggies_capita=only_veggies_ratio$dispo_protein/only_veggies_ratio$population)
   
   #no waste
+  #2.4.3
   pivot <- pivot %>% mutate(all_to_food=Food+Feed+Losses)
   
   

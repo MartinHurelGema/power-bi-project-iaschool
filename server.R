@@ -45,7 +45,7 @@ shinyServer(function(input, output) {
     )
     
     output$Table2 <- renderTable(
-        Cereal_consumption
+        Cereal_consumption %>% head(10)
     )
     
     output$Table3 <- renderTable(
