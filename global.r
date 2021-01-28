@@ -21,21 +21,28 @@ clean_data <- function(){
   animal$origin="animal"
   All_products <<- rbind(vegetal,animal)
   
+ 
+  
   # population mondiale
   population_table_tmp <- population[!population$`Area Code` %in% c(41,96,214,128),] 
   population_table <<- population_table_tmp %>% select(Area,`Area Code`,Value,Year)
   population_table$Value <- population_table$Value*1000
   
-  products <- All_products[,!names(All_products) %in% c("Domain Code","Domain")]
+  
+  #Country Initialization
+  countryInit <<- population_table %>% select(Area)
+  
+  
+  products <<- All_products[,!names(All_products) %in% c("Domain Code","Domain")]
   
   #pivoted = partout !!!! 
-  pivoted_table <- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
+  pivoted_table <<- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
   
-  cereals <- cereals[,!names(cereals) %in% c("Domain Code","Domain")]
-  codes <- cereals %>% distinct(`Item Code`) 
+  cereals <<- cereals[,!names(cereals) %in% c("Domain Code","Domain")]
+  codes <<- cereals %>% distinct(`Item Code`) 
   
   #2.1.1 & 2.2.1
-  pivoted_table <- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes))
+  pivoted_table <<- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes))
   
   
   #2.1.1
@@ -63,8 +70,9 @@ clean_data <- function(){
   # les plus caloriques
   #2.3.1
   calories <- pivot %>% group_by(Item,`Item Code`,Area)  %>% summarise(cal = mean(kcal_for_kg))
-  #2.2.2
-  cal <- calories %>% filter(cal < 10000) %>% group_by(Item) %>% summarise(cal = mean(cal))
+  #2.2.2 ratio??? à calculer???? faite votre travail !!!
+  
+  cal <<- calories %>% filter(cal < 10000) %>% group_by(Item) %>% summarise(cal = mean(cal))
   pivot <-left_join(x=pivot,y=cal,by="Item")
   pivot$kcal_for_kg <- NULL
   
@@ -76,7 +84,7 @@ clean_data <- function(){
   
   
   # les plus protéinés
-  #2.2.3
+  #2.2.3 manque ratio par pays
   prot <- pivot %>% group_by(Item,Area) %>% summarise(protein_ratio = `Protein supply quantity (g/capita/day)`/(kg_capita_day*1000) )
   prot <- prot %>% filter(protein_ratio < .42)
   prot <- prot %>% group_by(Item) %>% summarise(protein_ratio = mean(protein_ratio)) %>% arrange(desc(protein_ratio))

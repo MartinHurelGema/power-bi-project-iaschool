@@ -41,15 +41,71 @@ shinyServer(function(input, output) {
         #print(input$Area)
         #print(dispo_alimentaion(input$Area))
         #ggplot(data = dispo_alimentaion(input$Area))
-        cereals_list_verify(input$Area)
+        dispo_alimentaion(input$Area)
     )
     
     output$Table2 <- renderTable(
-        Cereal_consumption %>% head(10)
+        Cereal_consumption %>% select("Area Code","Area","Item Code", "Item", "Year", "origin", "is_cereal") %>% head(20)
     )
     
     output$Table3 <- renderTable(
-        disp_alim_per_item_fct()
+        pivoted_table %>% select("Area Code",
+                                 "Area",
+                                 "Item Code", 
+                                 "Item", 
+                                 "Year",
+                                 "origin",
+                                 "Domestic supply quantity",
+                                 "Export Quantity",
+                                 "Feed","Food",
+                                 "Other uses (non-food)",
+                                 "Processing",
+                                 "Production",
+                                 "Protein supply quantity (g/capita/day)") %>% 
+            head(20)
+    )
+    output$Table3.2 <- renderTable(
+        #population + waste
+        pivoted_table %>%
+            select("Protein supply quantity (g/capita/day)",
+                   "Seed",
+                   "Stock Variation", 
+                   "Food supply (kcal/capita/day)",
+                   "Protein supply quantity (g/capita/day)") %>% 
+            head(30)
+                    
+    )
+    
+    output$Table4 <- renderTable(
+           cal 
+    )
+    
+    output$Table5 <- renderTable(
+          prot
+    )
+    
+    output$Table6 <- renderTable(
+        calories %>% distinct(Item,.keep_all=TRUE)%>% head(5)
+    )
+    
+    output$Table7 <- renderTable(
+        
+        prot %>% head(5)
+    )
+    
+    output$Table8 <- renderTable(
+        
+        dispos_veggies
+    )
+    
+    output$Table9 <- renderTable(
+        
+        only_veggies_ratio
+    )
+    
+    output$Table10 <- renderTable(
+        
+        pivot %>% head(10)
     )
     
     # output$PieChart <- renderPlot({

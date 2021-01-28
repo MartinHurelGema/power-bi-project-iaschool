@@ -24,18 +24,57 @@ alimentation_proportion <<- function(...){
 
 dispo_alimentaion <<- function(country){
   
-  dispo_alim <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
-  select(`Item Code`,Item,`Area Code`,Area,Value,Year,Element,origin) %>% 
-  filter(Element %in% c(
-                  'Food supply quantity (kg/capita/yr)',
-                  'Food supply (kcal/capita/day)',
-                  'Protein supply quantity (g/capita/day)',
-                  'Fat supply quantity (g/capita/day)')) %>% 
-  spread(key = Element,value = Value) %>% 
-  filter(Area == country, origin == "vegetal") %>%
-  mutate(is_cereal = "True")
+  # dispo_alim <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>% 
+  # select(`Item Code`,Item,`Area Code`,Area,Value,Year,Element,origin) %>% 
+  # filter(Element %in% c(
+  #                 'Food supply quantity (kg/capita/yr)',
+  #                 'Food supply (kcal/capita/day)',
+  #                 'Protein supply quantity (g/capita/day)',
+  #                 'Fat supply quantity (g/capita/day)')) %>% 
+  # spread(key = Element,value = Value) %>% 
+  # filter(Area == country, origin == "vegetal") %>%
+  # mutate(is_cereal = "True")
+  #Country initialization
   
-  return(dispo_alim)
+  
+  
+  vegetal$origin="vegetal"
+  animal$origin="animal"
+  All_products <<- rbind(vegetal,animal)
+  
+  products <<- All_products[,!names(All_products) %in% c("Domain Code","Domain")]
+  
+   
+  pivoted_table <<- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
+  
+  cereals <<- cereals[,!names(cereals) %in% c("Domain Code","Domain")]
+  codes <<- cereals %>% distinct(`Item Code`) 
+  
+  
+  # print(country)
+  # if(country == "All"){ 
+  #   print("Ici ALL")
+  #   
+  #   pivoted_table <<- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes))
+  #   
+  #   print(pivoted_table)
+  #   
+  #   pivoted_table <<- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes)) %>% filter(Area == country)
+  #   return(pivoted_table)
+  # }else{
+  #   return(pivoted_table %>% head(10))
+  # 
+  # }else if(country != "Veuillez selectionner un pays." && country != "All"){
+  #   print("Ici Select")
+  #   
+  #   print("Ici Rien")
+  # }
+  
+  
+    pivoted_table <<- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes)) %>% filter(Area == country)
+    return(pivoted_table)
+  
+ 
 }
 #dispo_alimentaion("France")
 

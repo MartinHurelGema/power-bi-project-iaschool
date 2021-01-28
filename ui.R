@@ -22,21 +22,26 @@ shinyUI(fluidPage(
                                     plotOutput("LinePlot1")
                                 )
                             )),
-                   tabPanel("Alimentation",
+                   tabPanel("2.1.1 Alimentation - Analyse",
                             h1('Analyse de la disponibilitée alimentaire'),
-                            h1('Proportion des céréales pour l’alimentation animale'),
+                           
                             sidebarLayout(
                                 
-                                sidebarPanel = selectInput("Area", "Area",
-                                                               c("All", as.vector(disp_alim_per_item %>% select(Area) %>% distinct()) ),multiple = FALSE),
+                                sidebarPanel = selectInput("Area", 
+                                                           "Area",
+                                                           choices = c("Choose",as.vector(countryInit %>% distinct())),
+                                                           multiple = FALSE, 
+                                                           ),
                                 
-                                mainPanel = mainPanel(
+                                mainPanel(
                                     tableOutput("Table1")
-                                )    
+                                         )    
                                 
+                            )
                             ),
-                            
-                            h1('Proportion (en termes de poids) est destinée à lalimentation animale'),
+                   
+                   tabPanel("2.1.2 Alimentation - Liste de céreal",
+                            h1('Proportion des céréales pour l’alimentation animale'),
                             sidebarLayout(
                                 
                                 sidebarPanel = NULL,
@@ -44,16 +49,115 @@ shinyUI(fluidPage(
                                     tableOutput("Table2")
                                 )    
                                 
-                            ),
-        
-                            h1('Chiffres clés du dataset pour la disponibilitée alimentaire par item et par pays'),
-                            sidebarLayout(
-                                sidebarPanel = NULL,
-                                mainPanel = tableOutput("Table3")
                             )
                             ),
-                   tabPanel("tab 3",img(src="www/cute_cats.jpg")),
-                   tabPanel("tab 4",img(src="www/funny_cats.jpg"))
+                   
+                   tabPanel("2.2.1 Alimentation - Proportion ",
+                            h1('Dispo alimentaire par produit et pays'),
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table3")
+                                )    
+                                
+                            ),
+                            
+                            h1('Dispo alimentaire proteine par produit et pays'),
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table3.2")
+                                )    
+                                
+                            )
+                            
+                            ),
+                   
+                   tabPanel("2.2.2 Alimentation - Ration énergie/poids",
+                            h1('Ratio énergie poids par produit en kcal'),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table4")
+                                )    
+                                
+                            )
+                   ),
+                   tabPanel("2.2.3 Alimentation - Pourcentage proteine de chaque produit",
+                            h1("Pourcetage de protèine par produit et par pays"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table5")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("2.3.1 Les plus calorique",
+                            h1("Les 5 aliments parmis les 20 les plus caloriques"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table6")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("2.3.2 Les plus protéinés",
+                            h1("Les 5 aliments parmis les 20 les plus protéinés"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table7")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("2.4.1 Végétaux uniquement",
+                            h1("Disponibilité intérieurement mondiale des végétaux en kcal et en kg protéine par année"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table8")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("2.4.2 Tous végétarien",
+                            h1("Nombre humain végétarien nourris si toute la disponibilité intérieure mondiale de produits végétaux était utilisée pour de la nourriture"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table9")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("2.4.3 Rien se perd tous se transforme",
+                            h1("All to food"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table10")
+                                )    
+                                
+                            )
+                   )
+                   
         )
     )
     # f=reactive({
