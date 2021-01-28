@@ -66,9 +66,10 @@ shinyServer(function(input, output) {
     )
     output$Table3.2 <- renderTable(
         #population + waste
-        pivoted_table %>%
+        pivot %>%
             select("Protein supply quantity (g/capita/day)",
                    "Seed",
+                   "Value",
                    "Stock Variation", 
                    "Food supply (kcal/capita/day)",
                    "Protein supply quantity (g/capita/day)") %>% 
