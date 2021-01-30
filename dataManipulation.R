@@ -1,15 +1,11 @@
-# Taille de la population mondiale
-populationMondiale <<- function(){
-  evo_poppulation <- population_table %>% group_by(Year) %>% summarise(n = sum(Value))
-  return(evo_poppulation)
-}
+
 
 populationMondiale2 <<- function(){
   population_table_tmp <- population[!population$`Area Code` %in% c(41,96,214,128),] 
-  population_table <<- population_table_tmp %>% select(Area,`Area Code`,Value,Year) 
+  population_table <- population_table_tmp %>% select(Area,`Area Code`,Value,Year) 
   population_table$Value <- population_table$Value*1000
-  population_table
-  return(population_table)
+  evo_poppulation <- population_table %>% group_by(Year) %>% summarise(n = sum(Value))
+  return(evo_poppulation)
 }
 
 alimentation_proportion <<- function(...){

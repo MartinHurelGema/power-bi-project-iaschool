@@ -29,7 +29,7 @@ shinyServer(function(input, output) {
     
     
     output$LinePlot1 <- renderPlot({
-        ggplot(data = populationMondiale(), aes(x = Year, y = n))+
+        ggplot(data = populationMondiale2(), aes(x = Year, y = n))+
             geom_line()+
             labs(title = "évolution de la poppulation mondiale de 2014 a 2017", # plot title
                  x = "dates", # x axis label
@@ -69,7 +69,7 @@ shinyServer(function(input, output) {
         pivot %>%
             select("Protein supply quantity (g/capita/day)",
                    "Seed",
-                   "Value",
+                   "population_size",
                    "Stock Variation", 
                    "Food supply (kcal/capita/day)",
                    "Protein supply quantity (g/capita/day)") %>% 

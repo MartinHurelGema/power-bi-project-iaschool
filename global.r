@@ -24,8 +24,8 @@ clean_data <- function(){
  
   
   # population mondiale
-  population_table_tmp <- population[!population$`Area Code` %in% c(41,96,214,128),] 
-  population_table <<- population_table_tmp %>% select(Area,`Area Code`,Value,Year)
+  population_table_tmp <- population[!(population$`Area Code` %in% c(41,96,214,128)),] 
+  population_table <- population_table_tmp %>% select(Area,`Area Code`,Value,Year)
   population_table$Value <- population_table$Value*1000
   
   
@@ -55,10 +55,10 @@ clean_data <- function(){
    
   
   populations <- population_table %>% select(`Area Code`,Year,Value)
-  populations$Value <- populations$Value*1000
+
   #merge population with main table
-  pivot_new <- left_join(x=pivoted_table,y=populations,by="Area Code","Year")
-  pivot_new <- pivot_new[!pivot_new$`Area Code` %in% c(41,96,214,128),]
+  pivot_new <- pivoted_table[!(pivoted_table$`Area Code` %in% c(41,96,214,128)),]
+  pivot_new <- left_join(x=pivot_new,y=populations,by=c("Area Code","Year"))
  
   
   pivot <- pivot_new[( (pivot_new$Food > 0)  & (pivot_new$`Food supply quantity (kg/capita/yr)` != 0)  & (pivot_new$`Food supply (kcal/capita/day)` != 0) & !is.na(pivot_new$`Food supply (kcal/capita/day)`) & (!is.na(pivot_new$`Food supply quantity (kg/capita/yr)`)) ),]
@@ -73,7 +73,7 @@ clean_data <- function(){
   #2.2.2 ratio??? à calculer???? faite votre travail !!!
   
   cal <<- calories %>% filter(cal < 10000) %>% group_by(Item) %>% summarise(cal = mean(cal))
-  pivot <-left_join(x=pivot,y=cal,by="Item")
+  pivot <-left_join(x=pivot,y=cal,by=c("Item"))
   pivot$kcal_for_kg <- NULL
   
   #rename columns 
@@ -90,16 +90,14 @@ clean_data <- function(){
   prot <- prot %>% group_by(Item) %>% summarise(protein_ratio = mean(protein_ratio)) %>% arrange(desc(protein_ratio))
   
   pivot <- left_join(x=pivot,y=prot,by="Item")
-  pivot$Year.y <- NULL
-  pivot$protein_ratio.y <- NULL
+  
   
   # disponibilité mondiale en végéteaux
   #2.4.1
-  dispos_veggies <<- pivot %>% filter(origin == "vegetal") %>% group_by(Year.x)  %>% summarise(dispo_protein = sum(Food*1000000*protein_ratio) ,dispo_cal=sum(Food*1000000*calories_kg))
+  dispos_veggies <<- pivot %>% filter(origin == "vegetal") %>% group_by(Year)  %>% summarise(dispo_protein = sum(Food*1000000*protein_ratio) ,dispo_cal=sum(Food*1000000*calories_kg))
   
   ppl_year <- population_table %>% group_by(Year) %>% summarise(avg = sum(Value))
   
-  names(dispos_veggies)[names(dispos_veggies) == "Year.x"] <- "Year"
   only_veggies_ratio <- left_join(x=dispos_veggies,y=ppl_year, by="Year" )
   names(only_veggies_ratio)[names(only_veggies_ratio) == "avg"] <- "population"
   
@@ -107,9 +105,75 @@ clean_data <- function(){
   only_veggies_ratio <- only_veggies_ratio %>% mutate(kcal_on_veggies_capita = only_veggies_ratio$dispo_cal/only_veggies_ratio$population)
   only_veggies_ratio <<- only_veggies_ratio %>% mutate(protein_from_veggies_capita=only_veggies_ratio$dispo_protein/only_veggies_ratio$population)
   
+  
+  only_veggies_ratio <- only_veggies_ratio %>% mutate(pourcentage_de_gens_kcal = kcal_on_veggies_capita/365/2000*100)
+  only_veggies_ratio <- only_veggies_ratio %>% mutate(pourcentage_de_gens_protein = protein_from_veggies_capita*1000/365/40*100)
+  
   #no waste
+  #2.4.2
+  pivot <<- pivot %>% mutate(all_to_food=Food+Feed+Losses)
+  
+  
   #2.4.3
-  pivot <- pivot %>% mutate(all_to_food=Food+Feed+Losses)
+  dispos_no_waste <-  pivot[!is.na(pivot$Food) & !is.na(pivot$Feed) & !is.na(pivot$Losses),] %>% group_by(Year)  %>% summarise(dispo_protein = sum(all_to_food*1000000*protein_ratio) ,dispo_cal=sum(all_to_food*1000000*calories_kg))
+  dispos_no_waste <- left_join(x=dispos_no_waste,y=ppl_year, by="Year" )
+  names(dispos_no_waste)[names(dispos_no_waste) == "avg"] <- "population_size"
+  dispos_no_waste <- dispos_no_waste %>% mutate(population_nourrie_kcal_p=dispo_cal/population_size/365/2000*100)
+  dispos_no_waste <- dispos_no_waste %>% mutate(population_nourrie_kcal_prct=dispo_protein/population_size*1000/365/45*100)
+  
+  # 2.2.4
+  # alim_for_all <- pivot[!is.na(pivot$Losses),]
+  # alim_for_all <- alim_for_all[!is.na(alim_for_all$calories_kg),]
+  # alim_for_all <- alim_for_all[!is.na(alim_for_all$Food),]  %>% group_by(Year.x) %>% summarise(disp_food = sum((Food*1000000-Losses*1000000)*calories_kg))
+  # alim_for_all <- alim_for_all %>% rename(Year=Year.x)
+  # evo_poppulation <- population_table %>% group_by(Year) %>% summarise(capital = sum(Value))
+  # 
+  # alim_for_all_by_capital <-  merge(alim_for_all,evo_poppulation,by.x='Year')
+  # alim_for_all_by_capital <-  alim_for_all_by_capital %>% mutate(disp_food_for_human = capital*2100*365)
+  # alim_for_all_by_capital <-  alim_for_all_by_capital %>% mutate(percent = disp_food/disp_food_for_human)
+  
+  
+  ####3
+  sous_nutrition <- pivot[!is.na(pivot$Losses),] %>% group_by(Year,Area,population_size) %>% summarise(cal = sum(calories_kg*1000000*Food) - sum(calories_kg*Losses*1000000) )
+  sous_nutrition <- sous_nutrition %>% mutate(nb_personnes = population_size -  cal/365/2200) %>% filter(nb_personnes>0)
+  
+  # 3.3
+  
+  
+  export_products <- pivot[!is.na(pivot$`Export Quantity`),] %>%select(Item,`Export Quantity`)%>%  
+          group_by(Item) %>% summarise(quantity = sum(`Export Quantity`)) %>% arrange(desc(quantity)) %>% head(15)
+  
+  
+  # 3.4
+  importations <- pivot[!is.na(pivot$`Import Quantity`),] %>% select(Year,Area,Item,origin,`Import Quantity`) %>%  arrange(desc(`Import Quantity`)) %>% head(200)
+  
+  #3.5
+  
+  
+  importation_ratio_1 <- pivot[ !is.na(pivot$`Other uses (non-food)`) & !is.na(pivot$`Domestic supply quantity`),] %>% 
+    filter(`Domestic supply quantity` != 0 & `Other uses (non-food)` !=0) %>% group_by(Item) %>% 
+    summarise(ouses_disp = mean( `Other uses (non-food)`/(`Other uses (non-food)`+`Domestic supply quantity`)),) %>% 
+    filter(ouses_disp < 1) %>% 
+    arrange(desc(ouses_disp)) %>% head(15)
+  
+  
+  importation_ratio_2 <- pivot[ !is.na(pivot$Food) & !is.na(pivot$Feed),] %>% 
+    filter(Food != 0 & Feed !=0) %>% group_by(Item) %>% 
+    summarise(feed_food = mean( Feed/(Feed+Food)),) %>% 
+    filter(feed_food < 1) %>% 
+    arrange(desc(feed_food)) %>% head(15)
+  
+  
+  
+  #3.6
+  importation_ratio_ouses_disp_3 <- importation_ratio_1 %>% head(3) 
+  
+  importation_ratio_food_feed_3 <- importation_ratio_2 %>% head(3)
+  
+  # 3.7
+  
+  
+  
   
   
   
@@ -192,6 +256,7 @@ insertDatabase <<- function(){
   dataFrameToTable(con,'undernourished',undernourished)
   dataFrameToTable(con,'vegetal',vegetal)
   dataFrameToTable(con,'dispo_alim',dispo_alim)
+  dataFrameToTable(con,'pivot',pivot)
   }
 
 start_prog <<- function(){
