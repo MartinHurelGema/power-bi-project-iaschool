@@ -185,6 +185,8 @@ clean_data <- function(){
   
   # 3.7 compliqué...
   
+  
+  
   #pivot_table <<- pivot
   
   

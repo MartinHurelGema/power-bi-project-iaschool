@@ -41,14 +41,23 @@ shinyUI(fluidPage(
                             ),
                    
                    tabPanel("2.1.2 Alimentation - Liste de céreal",
-                            h1('Proportion des céréales pour l’alimentation animale'),
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table2")
-                                )    
-                                
+                            # h1('Proportion des céréales pour l’alimentation animale'),
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table2")
+                            #     )    
+                            #     
+                            # )
+                            
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Proportion des céréales pour l’alimentation animale"),
+                                       tableOutput("Table2")),
+                                column(width = 8,
+                                       h2("PieChart"),
+                                       plotOutput('PieChart',width = "50%"))
                             )
                             ),
                    

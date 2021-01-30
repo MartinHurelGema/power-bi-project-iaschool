@@ -152,7 +152,7 @@ shinyServer(function(input, output) {
     })
     
     output$PieChart <- renderPlot({
-        alim_proportion
+        alim_proportion()
         ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) +
             geom_bar(width = 1, stat = "identity", color = "white") +
             coord_polar("y", start = 0)+

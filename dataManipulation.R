@@ -93,10 +93,17 @@ cereals_list_verify <<- function(country){
 alim_proportion <<- function(){
 alimentation_proportion  <<- rbind(animal %>% mutate(origin = 'animal'),vegetal %>% mutate(origin = 'vegetal')) %>%
              filter (Element %in% c('Feed','Food')) %>% group_by(Element) %>% summarise(n = sum(Value)) %>% 
-             arrange(desc(n)) %>%
-             mutate(lab.ypos = cumsum(n) - 0.5*n)
-             
+             arrange(desc(n)) 
+            
+  
+   alimentation_proportion[1,2] <- feed_sum
+   alimentation_proportion[2,2] <- sum(Cereal_consumption$Food,na.rm = TRUE)      
+   
+   alimentation_proportion <- alimentation_proportion %>% mutate(lab.ypos = cumsum(n) - 0.5*n)
+   
    alimentation_proportion <<- alimentation_proportion %>% mutate(percent = round((n * 100 )/sum(alimentation_proportion$n),digits=0))
+   
+   
    return(alimentation_proportion)
 }
 #alim_proportion()
