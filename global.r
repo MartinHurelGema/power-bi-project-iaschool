@@ -27,7 +27,7 @@ clean_data <- function(){
   population_table_tmp <- population[!(population$`Area Code` %in% c(41,96,214,128)),] 
   population_table <- population_table_tmp %>% select(Area,`Area Code`,Value,Year)
   population_table$Value <- population_table$Value*1000
-  
+   
   
   #Country Initialization
   countryInit <<- population_table %>% select(Area)
@@ -103,7 +103,7 @@ clean_data <- function(){
   
   #2.4.2 + calcul à faire
   only_veggies_ratio <- only_veggies_ratio %>% mutate(kcal_on_veggies_capita = only_veggies_ratio$dispo_cal/only_veggies_ratio$population)
-  only_veggies_ratio <<- only_veggies_ratio %>% mutate(protein_from_veggies_capita=only_veggies_ratio$dispo_protein/only_veggies_ratio$population)
+  only_veggies_ratio <- only_veggies_ratio %>% mutate(protein_from_veggies_capita=only_veggies_ratio$dispo_protein/only_veggies_ratio$population)
   
   
   only_veggies_ratio <- only_veggies_ratio %>% mutate(pourcentage_de_gens_kcal = kcal_on_veggies_capita/365/2000*100)
@@ -111,7 +111,7 @@ clean_data <- function(){
   
   #no waste
   #2.4.2
-  pivot <<- pivot %>% mutate(all_to_food=Food+Feed+Losses)
+  pivot <- pivot %>% mutate(all_to_food=Food+Feed+Losses)
   
   
   #2.4.3
@@ -120,7 +120,7 @@ clean_data <- function(){
   names(dispos_no_waste)[names(dispos_no_waste) == "avg"] <- "population_size"
   dispos_no_waste <- dispos_no_waste %>% mutate(population_nourrie_kcal_p=dispo_cal/population_size/365/2000*100)
   dispos_no_waste <- dispos_no_waste %>% mutate(population_nourrie_kcal_prct=dispo_protein/population_size*1000/365/45*100)
-  
+
   # 2.2.4
   # alim_for_all <- pivot[!is.na(pivot$Losses),]
   # alim_for_all <- alim_for_all[!is.na(alim_for_all$calories_kg),]
@@ -175,7 +175,7 @@ clean_data <- function(){
   
   
   
-  
+  pivot_table <<- pivot
   
   
   # population <<- population %>% mutate(population_value = Value*strtoi(gsub("[^0-9.]","", Unit))/1000000000)
@@ -256,7 +256,7 @@ insertDatabase <<- function(){
   dataFrameToTable(con,'undernourished',undernourished)
   dataFrameToTable(con,'vegetal',vegetal)
   dataFrameToTable(con,'dispo_alim',dispo_alim)
-  dataFrameToTable(con,'pivot',pivot)
+  dataFrameToTable(con,'pivot_table',pivot_table)
   }
 
 start_prog <<- function(){
