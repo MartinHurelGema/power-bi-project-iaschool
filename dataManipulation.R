@@ -41,7 +41,7 @@ dispo_alimentaion <<- function(country){
   products <<- All_products[,!names(All_products) %in% c("Domain Code","Domain")]
   
    
-  pivoted_table <<- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
+  #pivoted_table <<- tidyr::pivot_wider(products,id_cols=c("Area Code","Area","Year","Item Code","Item","origin"),names_from= "Element",values_from = Value)
   
   cereals <<- cereals[,!names(cereals) %in% c("Domain Code","Domain")]
   codes <<- cereals %>% distinct(`Item Code`) 
@@ -67,7 +67,7 @@ dispo_alimentaion <<- function(country){
   # }
   
   
-    pivoted_table <<- pivoted_table %>% mutate(is_cereal = `Item Code` %in% pull(codes)) %>% filter(Area == country)
+    pivoted_table <<- pivot_final %>% filter(Area == country)
     return(pivoted_table)
   
  
@@ -111,3 +111,7 @@ disp_alim_per_item_fct()
 test <<- function(){
   return("Effectivement")
 }
+
+
+
+

@@ -109,18 +109,20 @@ clean_data <- function(){
   only_veggies_ratio <- only_veggies_ratio %>% mutate(pourcentage_de_gens_kcal = kcal_on_veggies_capita/365/2000*100)
   only_veggies_ratio <- only_veggies_ratio %>% mutate(pourcentage_de_gens_protein = protein_from_veggies_capita*1000/365/40*100)
   
+  only_veggies_ratio_final <<- only_veggies_ratio
   #no waste
-  #2.4.2
+ 
   pivot <- pivot %>% mutate(all_to_food=Food+Feed+Losses)
   
+  pivot_final <<- pivot
   
   #2.4.3
-  dispos_no_waste <-  pivot[!is.na(pivot$Food) & !is.na(pivot$Feed) & !is.na(pivot$Losses),] %>% group_by(Year)  %>% summarise(dispo_protein = sum(all_to_food*1000000*protein_ratio) ,dispo_cal=sum(all_to_food*1000000*calories_kg))
+  dispos_no_waste <-  pivot[!is.na(pivot$Food) & !is.na(pivot$Feed) & !is.na(pivot$Losses),] %>% group_by(Year) %>% summarise(dispo_protein = sum(all_to_food*1000000*protein_ratio) ,dispo_cal=sum(all_to_food*1000000*calories_kg))
   dispos_no_waste <- left_join(x=dispos_no_waste,y=ppl_year, by="Year" )
   names(dispos_no_waste)[names(dispos_no_waste) == "avg"] <- "population_size"
   dispos_no_waste <- dispos_no_waste %>% mutate(population_nourrie_kcal_p=dispo_cal/population_size/365/2000*100)
   dispos_no_waste <- dispos_no_waste %>% mutate(population_nourrie_kcal_prct=dispo_protein/population_size*1000/365/45*100)
-
+  dispos_no_waste_final <<- dispos_no_waste
   # 2.2.4
   # alim_for_all <- pivot[!is.na(pivot$Losses),]
   # alim_for_all <- alim_for_all[!is.na(alim_for_all$calories_kg),]
@@ -133,22 +135,30 @@ clean_data <- function(){
   # alim_for_all_by_capital <-  alim_for_all_by_capital %>% mutate(percent = disp_food/disp_food_for_human)
   
   
-  ####3
-  sous_nutrition <- pivot[!is.na(pivot$Losses),] %>% group_by(Year,Area,population_size) %>% summarise(cal = sum(calories_kg*1000000*Food) - sum(calories_kg*Losses*1000000) )
-  sous_nutrition <- sous_nutrition %>% mutate(nb_personnes = population_size -  cal/365/2200) %>% filter(nb_personnes>0)
+  ####3.1 
+  undernutrition_ratio <- read.csv("data_fao/undernourishment.csv")
+  undernutrition_ratio$ratios <- undernutrition_ratio$Suite.of.Food.Security.Indicators...Prevalence.of.undernourishment..percent...3.year.average....210041...Value...6121....
+  undernutrition_ratio <- undernutrition_ratio %>% filter(Year<2018 & Year>2013) %>% group_by(Year,Entity) %>% summarise(ratio = mean(ratios))
+  total_ratio_undernutrition <- undernutrition_ratio %>% summarise(total_population=mean(ratio))
   
-  # 3.3
+  total_ratio_undernutrition_final <<- total_ratio_undernutrition
+  ###3.2 
+  undernutrition_numbers <- read.csv("data_fao/undernutrition.csv")
+  undernutrition_numbers$Value <- as.numeric(undernutrition_numbers$Value)
+  undernutrition_numbers <- undernutrition_numbers %>% filter(Flag == "F" &  Year == "2013-2015") %>% group_by(Year,Area,Unit) %>% summarise(people = sum(Value)) %>% arrange(desc(people))
+ 
+  undernutrition_numbers_final <<- undernutrition_numbers
   
-  
-  export_products <- pivot[!is.na(pivot$`Export Quantity`),] %>%select(Item,`Export Quantity`)%>%  
-          group_by(Item) %>% summarise(quantity = sum(`Export Quantity`)) %>% arrange(desc(quantity)) %>% head(15)
-  
+  #3.3?
+
+  export_products <- pivot[!is.na(pivot$`Export Quantity`),] %>% select(Item,`Export Quantity`)%>%group_by(Item) %>% summarise(quantity = sum(`Export Quantity`)) %>% arrange(desc(quantity)) %>% head(15)
+  export_products_final <<- export_products
   
   # 3.4
   importations <- pivot[!is.na(pivot$`Import Quantity`),] %>% select(Year,Area,Item,origin,`Import Quantity`) %>%  arrange(desc(`Import Quantity`)) %>% head(200)
+  importations_final <<- importations
   
   #3.5
-  
   
   importation_ratio_1 <- pivot[ !is.na(pivot$`Other uses (non-food)`) & !is.na(pivot$`Domestic supply quantity`),] %>% 
     filter(`Domestic supply quantity` != 0 & `Other uses (non-food)` !=0) %>% group_by(Item) %>% 
@@ -163,19 +173,19 @@ clean_data <- function(){
     filter(feed_food < 1) %>% 
     arrange(desc(feed_food)) %>% head(15)
   
-  
+  importation_ratio_1_final <<- importation_ratio_1
+  importation_ratio_2_final <<- importation_ratio_2
   
   #3.6
   importation_ratio_ouses_disp_3 <- importation_ratio_1 %>% head(3) 
-  
   importation_ratio_food_feed_3 <- importation_ratio_2 %>% head(3)
   
-  # 3.7
+  importation_ratio_ouses_disp_3_final <<- importation_ratio_ouses_disp_3
+  importation_ratio_food_feed_3_final <<- importation_ratio_food_feed_3
   
+  # 3.7 compliqué...
   
-  
-  
-  pivot_table <<- pivot
+  #pivot_table <<- pivot
   
   
   # population <<- population %>% mutate(population_value = Value*strtoi(gsub("[^0-9.]","", Unit))/1000000000)

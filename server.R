@@ -49,33 +49,10 @@ shinyServer(function(input, output) {
     )
     
     output$Table3 <- renderTable(
-        pivoted_table %>% select("Area Code",
-                                 "Area",
-                                 "Item Code", 
-                                 "Item", 
-                                 "Year",
-                                 "origin",
-                                 "Domestic supply quantity",
-                                 "Export Quantity",
-                                 "Feed","Food",
-                                 "Other uses (non-food)",
-                                 "Processing",
-                                 "Production",
-                                 "Protein supply quantity (g/capita/day)") %>% 
+        pivot_final %>% 
             head(20)
     )
-    output$Table3.2 <- renderTable(
-        #population + waste
-        pivot %>%
-            select("Protein supply quantity (g/capita/day)",
-                   "Seed",
-                   "population_size",
-                   "Stock Variation", 
-                   "Food supply (kcal/capita/day)",
-                   "Protein supply quantity (g/capita/day)") %>% 
-            head(30)
-                    
-    )
+    
     
     output$Table4 <- renderTable(
            cal 
@@ -83,10 +60,11 @@ shinyServer(function(input, output) {
     
     output$Table5 <- renderTable(
           prot
+          
     )
     
     output$Table6 <- renderTable(
-        calories %>% distinct(Item,.keep_all=TRUE)%>% head(5)
+        cal %>% distinct(Item,.keep_all=TRUE) %>% arrange(desc(cal)) %>% head(5)
     )
     
     output$Table7 <- renderTable(
@@ -101,16 +79,94 @@ shinyServer(function(input, output) {
     
     output$Table9 <- renderTable(
         
-        only_veggies_ratio
+        only_veggies_ratio_final
     )
     
     output$Table10 <- renderTable(
-        
-        pivot %>% head(10)
+        dispos_no_waste_final
     )
     
+    output$Table11 <- renderTable( 
+        total_ratio_undernutrition_final
+    )
+    
+    output$Table12 <- renderTable(
+        undernutrition_numbers_final #3.2
+    )
+    
+    output$Table13 <- renderTable(
+        export_products_final   #3.3
+    )
+    
+    output$Table14 <- renderTable(
+        importations_final
+    )
+    
+    output$Table15 <- renderTable(
+        importation_ratio_1_final #3.5.1
+    )
+    
+    output$Table16 <- renderTable(
+        importation_ratio_2_final #3.5.2
+    )
+    
+    output$Table17 <- renderTable(
+        importation_ratio_ouses_disp_3_final#3.6.1
+    )
+    
+    output$Table18 <- renderTable(
+        importation_ratio_food_feed_3_final #3.6.2
+    )
+    
+    output$Table19 <- renderTable(
+        pivot_table #3.7
+    )
+    
+    # dataset =  prot
+    
+    output$Table20 <- renderPlot({
+        ggplot(pivot_final,aes(origin,calories_kg,fill=origin)) + geom_violin()
+    })
+                                   
+    output$Table21 <- renderPlot({
+        
+        #ggplot(only_veggies_ratio_final, aes(x=Year, y=pourcentage_de_gens_kcal*population/100)) + geom_bar(stat="identity") 
+        
+        
+        # ggplot(only_veggies_ratio_final, aes(x = population,"", fill=factor())) + 
+        #     geom_bar(width = 1) +
+        #     theme(axis.line = element_blank(), 
+        #           plot.title = element_text(hjust=0.5)) + 
+        #     labs(fill="class", 
+        #          x=NULL, 
+        #          y=NULL, 
+        #          title="Pie Chart of class", 
+        #          caption="Source: mpg")+ coord_polar(theta = "y", start=0)
+        #     
+        
+        # ggplot(data = only_veggies_ratio_final , aes(x ="" ,y=population, fill = population )) + 
+        #             geom_bar(width = 1, stat = "identity", color = "white") +
+        #              coord_polar("y", start = 0)+
+        #              theme_void()+
+        #             ggtitle('Proportion des céréales pour l’alimentation animale')
+    })
+    
+    output$PieChart <- renderPlot({
+        alim_proportion
+        ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) +
+            geom_bar(width = 1, stat = "identity", color = "white") +
+            coord_polar("y", start = 0)+
+            geom_text(aes(y=lab.ypos,label = percent(percent,scale = 1)), color = "white")+
+            theme_void()+
+            ggtitle('Proportion des céréales pour l’alimentation animale')
+    })
+    
+    
+    
+    
+    
     # output$PieChart <- renderPlot({
-    #     ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) + 
+    #     ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) +
     #         geom_bar(width = 1, stat = "identity", color = "white") +
     #         coord_polar("y", start = 0)+
     #         geom_text(aes(y=lab.ypos,label = percent(percent,scale = 1)), color = "white")+

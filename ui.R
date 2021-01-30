@@ -61,53 +61,53 @@ shinyUI(fluidPage(
                                     tableOutput("Table3")
                                 )    
                                 
-                            ),
-                            
-                            h1('Dispo alimentaire proteine par produit et pays'),
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table3.2")
-                                )    
-                                
                             )
                             
                             ),
                    
                    tabPanel("2.2.2 Alimentation - Ration énergie/poids",
-                            h1('Ratio énergie poids par produit en kcal'),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table4")
-                                )    
-                                
+                            # h1('Ratio énergie poids par produit en kcal'),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table4")
+                            #     )    
+                            #     
+                            # )
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Ratio énergie poids par produit en kcal"),
+                                       tableOutput("Table4")),
+                                column(width = 8,
+                                       h2("Graph violon"),
+                                       plotOutput('Table20',width = "50%"))
                             )
                    ),
                    tabPanel("2.2.3 Alimentation - Pourcentage proteine de chaque produit",
-                            h1("Pourcetage de protèine par produit et par pays"),  
+                            h1("Pourcetage de protèine par produit et par pays"),
                             sidebarLayout(
-                                
+
                                 sidebarPanel = NULL,
                                 mainPanel = mainPanel(
                                     tableOutput("Table5")
-                                )    
-                                
+                                )
+
                             )
+                           
                    ),
                    
                    tabPanel("2.3.1 Les plus calorique",
-                            h1("Les 5 aliments parmis les 20 les plus caloriques"),  
+                            h1("Les 5 aliments parmis les 20 les plus caloriques"),
                             sidebarLayout(
-                                
+
                                 sidebarPanel = NULL,
                                 mainPanel = mainPanel(
                                     tableOutput("Table6")
-                                )    
-                                
+                                )
+
                             )
+                            
                    ),
                    
                    tabPanel("2.3.2 Les plus protéinés",
@@ -156,7 +156,113 @@ shinyUI(fluidPage(
                                 )    
                                 
                             )
+                   ),
+                   
+                   tabPanel("3.1 Proportion de la pop en sous-nutrition " ,
+                            h1("Population en sous-nutrition"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table11")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("3.2 Liste des pays en sous-nutrition" ,
+                            h1("Pays :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table12")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("3.3 Liste des produits les plus exportés " ,
+                            h1(""),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table13")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("3.4 Les plus grandes importations ?" ,
+                            h1("Les 200 plus grandes importations de ces produits :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table14")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("3.5 Regrouper les importations par produit" ,
+                            h1("Ratio 1 :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table15")
+                                )    
+                                
+                            ),
+                            
+                            h1("Ratio 2:"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table16")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("3.6 Top 3 produits" ,
+                            h1("Ratio (disp) :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table17")
+                                )    
+                                
+                            ),
+                            
+                            h1("Ratio (feed) :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table18")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("3.7 Tonnes de céréales caculé  si les USA diminuaient leur production de produits animaux de 10%",
+                            h1("Des céréales pourraient être libérées :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    tableOutput("Table19")
+                                )    
+                            )
                    )
+                   
+                  
+                    
                    
         )
     )
