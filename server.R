@@ -21,6 +21,16 @@ library(scales)
 library(DT)
 library(gridExtra)
 library(grid)
+library(leaflet)
+library(plotly)
+library(Amelia)
+library(geojsonio)
+library(rgdal)
+library(binr)
+library(ggthemes)
+library(scales)
+library(ggfortify)
+library(rjson)
 # Define server logic required to draw a histogram
 
 
@@ -31,9 +41,9 @@ shinyServer(function(input, output) {
     output$LinePlot1 <- renderPlot({
         ggplot(data = populationMondiale2(), aes(x = Year, y = n))+
             geom_line()+
-            labs(title = "évolution de la poppulation mondiale de 2014 a 2017", # plot title
-                 x = "dates", # x axis label
-                 y = "poppulation (billion) " # y axis label
+            labs(title = "Évolution de la population mondiale de 2014 à 2017", # plot title
+                 x = "Dates", # x axis label
+                 y = "Population (milliard) " # y axis label
             )
     })
     
@@ -161,10 +171,166 @@ shinyServer(function(input, output) {
             ggtitle('Proportion des céréales pour l’alimentation animale')
     })
     
+    output$barChartCal <- renderPlot({
+        newcal <- cal %>% distinct(Item,.keep_all=TRUE) %>% arrange(desc(cal)) %>% head(5)
+        
+        ggplot(newcal, aes(x = Item, y=cal-8500, fill= Item)) + # set up the plot
+            geom_bar(stat="identity") # add the barpot
+    })
     
+    output$barChartProt <- renderPlot({
+        newprot <- prot  %>% head(5)
+        
+        ggplot(newprot, aes(x = Item, y=protein_ratio, fill= Item)) + # set up the plot
+            geom_bar(stat="identity") # add the barpot
+    })
     
+    output$smooth1 <- renderPlot({
+        new <- dispos_veggies
+        
+        ggplot(new,aes(Year,dispo_cal))+geom_point()+geom_smooth()
+    })
     
+    output$smooth2 <- renderPlot({
+        new <- dispos_veggies
+        
+        ggplot(new,aes(Year,dispo_protein))+geom_point()+geom_smooth()
+    })
     
+    output$barplotkcal <- renderPlot({
+        data <- only_veggies_ratio_final
+        
+        condition <- c(data$pourcentage_de_gens_kcal,data$pourcentage_de_gens_protein)
+        
+        
+        
+        
+        # ggplot(data, aes(x=Year, y=pourcentage_de_gens_kcal, fill=pourcentage_de_gens_protein)) +
+        #     geom_bar(stat="identity", color="black", position=position_dodge())+
+        #     theme_minimal()
+        # 
+        
+        ggplot(data, aes(x = Year,y= pourcentage_de_gens_kcal - 120)) + geom_bar(stat="identity") # add the barpot
+        
+    })
+    
+    output$barplot2 <- renderPlot({
+        data <- only_veggies_ratio_final
+        
+        condition <- c(data$pourcentage_de_gens_kcal,data$pourcentage_de_gens_protein)
+        
+    
+        # ggplot(data, aes(x=Year, y=pourcentage_de_gens_kcal, fill=pourcentage_de_gens_protein)) +
+        #     geom_bar(stat="identity", color="black", position=position_dodge())+
+        #     theme_minimal()
+        # 
+        
+        ggplot(data, aes(x = Year,y= pourcentage_de_gens_kcal - 120)) + geom_bar(stat="identity") # add the barpot
+        
+    })
+  
+    output$gdp <- renderPlot({
+        # world <- geojsonio::geojson_read("json/world.geojson", what="sp")
+        # temp <-  names(undernutrition_numbers_final)[names(undernutrition_numbers_final) == "Area"] <- "NAME"
+        # 
+        # newWorld <- left_join(x=world, y=undernutrition_numbers_final,by = "name")
+        #     
+        # leaflet(world)%>%
+        #         addProviderTiles("MapBox", options = providerTileOptions(
+        #             name = "mapbox.light",
+        #             accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN'))) %>% addPolygons(~pal(undernutrition_numbers_final$people))
+        # 
+        # 
+        #     names(world)
+        #     head(world,1)
+        
+       
+        # 
+        # 
+        # 
+        # m <- leaflet(world) %>% addTiles()
+        # b <- bins(undernutrition_numbers_final$people,target.bins = dim(undernutrition_numbers_final)[1],max.breaks=dim(undernutrition_numbers_final)[1])
+        # labels <- sprintf(
+        #     "<strong>%s</strong><br/>peoplee : millions",
+        #     undernutrition_numbers_final$Area, undernutrition_numbers_final$people
+        # ) %>% lapply(htmltools::HTML)
+        # 
+        # 
+        # 
+        # 
+        # bins <- as.list(b$xval)
+        # pal <- colorBin("YlOrRd", domain = undernutrition_numbers_final$people, bins = bins)
+        # m %>% addPolygons(
+        #     fillColor = ~pal(undernutrition_numbers_final$people),
+        #     weight = 2,
+        #     opacity = 1,
+        #     color = "white",
+        #     dashArray = "3",
+        #     fillOpacity = 0.7,highlight = highlightOptions(
+        #         weight = 5,
+        #         color = "#666",
+        #         dashArray = "",
+        #         fillOpacity = 0.7,
+        #         bringToFront = TRUE),
+        #     label = labels,
+        #     labelOptions = labelOptions(
+        #         style = list("font-weight" = "normal", padding = "3px 8px"),
+        #         textsize = "15px",
+        #         direction = "auto")
+        # )
+        
+        # world <- geojsonio::geojson_read("json/world.geojson", what="sp")
+        # 
+        # fig <- plot_ly() 
+        # fig <- fig %>% add_trace(
+        #     type="choroplethmapbox",
+        #     geojson=world,
+        #     #locations=locs,
+        #     #z=color_by,
+        #     #colorscale=fill,
+        #     reversescale=TRUE,
+        #     featureidkey="properties.NAME",
+        #     zmin=25,
+        #     zmax=125,
+        #     marker=list(line=list(
+        #         width=0),
+        #         opacity=0.5
+        #     )
+        # )
+        # 
+        # fig <- fig %>% colorbar(title=color_bar)
+        # fig <- fig %>% layout(
+        #     title=title,
+        #     mapbox=list(
+        #         style="carto-positron",
+        #         zoom =10.5,
+        #         center=list(lon= 2.35, lat=48.86))
+        #     
+        # )
+        # fig
+        
+        gdp <- read.csv("GDP.csv") %>% filter(Year == 2014)
+        names(gdp)[names(gdp) == "Entity"] <- "Area"
+        names(gdp)[names(gdp) ==  "Real.GDP.per.capita.in.2011US...2011.benchmark..Maddison.Project.Database..2018.."] <- "gdp"
+        undernutrition_numbers_final$Year <- "2014"
+        gdp$Year <- as.character(gdp$Year)
+        gdp_undernutrition <- left_join(x=gdp,y=undernutrition_numbers_final[!is.na(undernutrition_numbers_final$people),],by=c("Year","Area")) %>%  filter(people < 30)
+        pop <- population_table[population_table$Year == 2014,]
+        pop$Year <- as.character(pop$Year)
+        gdp_undernutrition <- left_join(x=gdp_undernutrition,y=pop,by=c("Area","Year"))
+        ggplot(gdp_undernutrition,aes(x = gdp,y=people,size=Value)) +geom_point(alpha=0.3) + scale_size(range = c(.1, 24), name="Population (M)") +theme_light()
+        
+        })
+    output$PieChart2 <- renderPlot({
+        
+        ggplot(data = total_ratio_undernutrition_final ,aes(x = '',y = n,fill = Element)) +
+            geom_bar(width = 1, stat = "identity", color = "white") +
+            coord_polar("y", start = 0)+
+            geom_text(aes(y=lab.ypos,label = percent(percent,scale = 1)), color = "white")+
+            theme_void()+
+            ggtitle('Proportion des céréales pour l’alimentation animale')
+    })
+        
     # output$PieChart <- renderPlot({
     #     ggplot(data = alimentation_proportion ,aes(x = '',y = n,fill = Element)) +
     #         geom_bar(width = 1, stat = "identity", color = "white") +
@@ -195,6 +361,44 @@ shinyServer(function(input, output) {
     #     
     # }
     # 
+    
+    output$map <- renderImage({
+        world <- geojsonio::geojson_read("json/world.geojson", what="sp")
+        
+        
+        
+        url <- 'https://raw.githubusercontent.com/plotly/datasets/master/election.geojson'
+        geojson <- rjson::fromJSON(file=url)
+        url2<- "https://raw.githubusercontent.com/plotly/datasets/master/election.csv"
+        
+        df <- read.csv(url2)
+        g <- list(
+            fitbounds = "locations",
+            visible = FALSE
+        )
+        fig <- plot_ly() 
+        fig <- fig %>% add_trace(
+            type="choroplethmapbox",
+            geojson=geojson,
+            locations=df$district,
+            z=df$Bergeron,
+            colorscale="Viridis",
+            featureidkey="properties.district"
+        )
+        fig <- fig %>% colorbar(title = "Bergeron Votes")
+        fig <- fig %>% layout(
+            mapbox=list(
+                style="carto-positron",
+                zoom =9,
+                center=list(lon=-73.7073, lat=45.5517))
+        )
+        fig
+        
+      
+        
+    })
+    
+    
     
     onSessionEnded(function(){
         stop_connection()    

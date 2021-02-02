@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+library(shinyWidgets)
 library(shiny)
 
 # Define UI for application that draws a histogram
@@ -22,7 +22,8 @@ shinyUI(fluidPage(
                                     plotOutput("LinePlot1")
                                 )
                             )),
-                   tabPanel("2.1.1 Alimentation - Analyse",
+                   #2.1.1
+                   tabPanel("Alimentation - Analyse",
                             h1('Analyse de la disponibilitée alimentaire'),
                            
                             sidebarLayout(
@@ -39,8 +40,8 @@ shinyUI(fluidPage(
                                 
                             )
                             ),
-                   
-                   tabPanel("2.1.2 Alimentation - Liste de céreal",
+                   #2.1.2
+                   tabPanel("Alimentation - Liste de céreal",
                             # h1('Proportion des céréales pour l’alimentation animale'),
                             # sidebarLayout(
                             #     
@@ -56,25 +57,25 @@ shinyUI(fluidPage(
                                        h2("Proportion des céréales pour l’alimentation animale"),
                                        tableOutput("Table2")),
                                 column(width = 8,
-                                       h2("PieChart"),
+                                       h2(""),
                                        plotOutput('PieChart',width = "50%"))
                             )
                             ),
-                   
-                   tabPanel("2.2.1 Alimentation - Proportion ",
-                            h1('Dispo alimentaire par produit et pays'),
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table3")
-                                )    
-                                
-                            )
-                            
-                            ),
-                   
-                   tabPanel("2.2.2 Alimentation - Ration énergie/poids",
+                   #2.2.1
+                   # tabPanel("Alimentation - Proportion ",
+                   #          h1('Dispo alimentaire par produit et pays'),
+                   #          sidebarLayout(
+                   #              
+                   #              sidebarPanel = NULL,
+                   #              mainPanel = mainPanel(
+                   #                  tableOutput("Table3")
+                   #              )    
+                   #              
+                   #          )
+                   #          
+                   #          ),
+                   #2.2.2
+                   tabPanel("Alimentation - Ration énergie/poids",
                             # h1('Ratio énergie poids par produit en kcal'),  
                             # sidebarLayout(
                             #     
@@ -89,12 +90,13 @@ shinyUI(fluidPage(
                                        h2("Ratio énergie poids par produit en kcal"),
                                        tableOutput("Table4")),
                                 column(width = 8,
-                                       h2("Graph violon"),
+                                       h2(""),
                                        plotOutput('Table20',width = "50%"))
                             )
                    ),
-                   tabPanel("2.2.3 Alimentation - Pourcentage proteine de chaque produit",
-                            h1("Pourcetage de protèine par produit et par pays"),
+                   #2.2.3
+                   tabPanel("Alimentation - Pourcentage proteine de chaque produit",
+                            h1("Pourcentage de protèine par produit"),
                             sidebarLayout(
 
                                 sidebarPanel = NULL,
@@ -105,57 +107,98 @@ shinyUI(fluidPage(
                             )
                            
                    ),
-                   
-                   tabPanel("2.3.1 Les plus calorique",
-                            h1("Les 5 aliments parmis les 20 les plus caloriques"),
-                            sidebarLayout(
-
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table6")
-                                )
-
+                   #2.3.1
+                   tabPanel("Les plus calorique",
+                            # h1("Les 5 aliments parmis les 20 les plus caloriques"),
+                            # sidebarLayout(
+                            # 
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table6")
+                            #     )
+                            # 
+                            # )
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Ratio énergie poids par produit en kcal"),
+                                       tableOutput("Table6")),
+                                column(width = 8,
+                                       h2(""),
+                                       plotOutput('barChartCal',width = "50%"))
                             )
                             
                    ),
-                   
-                   tabPanel("2.3.2 Les plus protéinés",
-                            h1("Les 5 aliments parmis les 20 les plus protéinés"),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table7")
-                                )    
-                                
+                   #2.3.2
+                   tabPanel("Les plus protéinés",
+                            # h1("Les 5 aliments parmis les 20 les plus protéinés"),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table7")
+                            #     )    
+                            #     
+                            # )
+                            
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Les 5 aliments parmis les 20 les plus protéinés"),
+                                       tableOutput("Table7")),
+                                column(width = 8,
+                                       h2(""),
+                                       plotOutput('barChartProt',width = "75%"))
                             )
                    ),
-                   
-                   tabPanel("2.4.1 Végétaux uniquement",
-                            h1("Disponibilité intérieurement mondiale des végétaux en kcal et en kg protéine par année"),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table8")
-                                )    
-                                
+                   #2.4.1
+                   tabPanel("Végétaux uniquement",
+                            # h1("Disponibilité intérieure mondiale des végétaux en kcal et en kg protéine par année"),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table8")
+                            #     )    
+                            #     
+                            # )
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Disponibilité intérieure mondiale des végétaux en kcal et en kg protéine par année"),
+                                       tableOutput("Table8")),
+                                column(width = 8,
+                                       h2("Disponibilité par année en fonction de calories"),
+                                       plotOutput('smooth1',width = "75%")),
+                            ),
+                            fluidRow(
+                                column(width = 4,
+                                       h2(""),
+                                       tableOutput("")),
+                                column(width = 8,
+                                       h2("Disponibilité par année en fonction de protéine"),
+                                       plotOutput('smooth2',width = "75%")),
                             )
                    ),
-                   
-                   tabPanel("2.4.2 Tous végétarien",
-                            h1("Nombre humain végétarien nourris si toute la disponibilité intérieure mondiale de produits végétaux était utilisée pour de la nourriture"),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table9")
-                                )    
-                                
+                   #2.4.2
+                   tabPanel("Tous végétarien",
+                            # h1("Nombre humain végétarien nourris si toute la disponibilité intérieure mondiale de produits végétaux était utilisée pour de la nourriture"),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table9")
+                            #     )    
+                            #     
+                            # )
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Nombre humain végétarien nourris si toute la disponibilité intérieure mondiale de produits végétaux était utilisée pour de la nourriture"),
+                                       tableOutput("Table9")),
+                                column(width = 8,
+                                       h2(""),
+                                       plotOutput('',width = "75%")),
                             )
                    ),
-                   
-                   tabPanel("2.4.3 Rien se perd tous se transforme",
+                   #2.4.3
+                   tabPanel("Rien se perd tous se transforme",
                             h1("All to food"),  
                             sidebarLayout(
                                 
@@ -166,8 +209,8 @@ shinyUI(fluidPage(
                                 
                             )
                    ),
-                   
-                   tabPanel("3.1 Proportion de la pop en sous-nutrition " ,
+                   #3.1
+                   tabPanel("Proportion de la population en sous-nutrition " ,
                             h1("Population en sous-nutrition"),  
                             sidebarLayout(
                                 
@@ -178,20 +221,29 @@ shinyUI(fluidPage(
                                 
                             )
                    ),
-                   
-                   tabPanel("3.2 Liste des pays en sous-nutrition" ,
-                            h1("Pays :"),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table12")
-                                )    
-                                
+                   #3.2
+                   tabPanel("Liste des pays en sous-nutrition" ,
+                            # h1("Pays :"),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table12")
+                            #     )    
+                            #     
+                            # )
+                            
+                            fluidRow(
+                                column(width = 4,
+                                       h2(" "),
+                                       tableOutput("Table12")),
+                                column(width = 8,
+                                       h2(""),
+                                       plotOutput("gdp", width = "95%")),
                             )
                    ),
-                   
-                   tabPanel("3.3 Liste des produits les plus exportés " ,
+                   #3.3
+                   tabPanel("Liste des produits les plus exportés " ,
                             h1(""),  
                             sidebarLayout(
                                 
@@ -202,8 +254,8 @@ shinyUI(fluidPage(
                                 
                             )
                    ),
-                   
-                   tabPanel("3.4 Les plus grandes importations ?" ,
+                   #3.4
+                   tabPanel("Les plus grandes importations ?" ,
                             h1("Les 200 plus grandes importations de ces produits :"),  
                             sidebarLayout(
                                 
@@ -214,30 +266,38 @@ shinyUI(fluidPage(
                                 
                             )
                    ),
-                   
-                   tabPanel("3.5 Regrouper les importations par produit" ,
-                            h1("Ratio 1 :"),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table15")
-                                )    
-                                
-                            ),
-                            
-                            h1("Ratio 2:"),  
-                            sidebarLayout(
-                                
-                                sidebarPanel = NULL,
-                                mainPanel = mainPanel(
-                                    tableOutput("Table16")
-                                )    
-                                
+                   #3.5
+                   tabPanel("Regrouper les importations par produit" ,
+                            # h1("Ratio 1 :"),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table15")
+                            #     )    
+                            #     
+                            # ),
+                            # 
+                            # h1("Ratio 2:"),  
+                            # sidebarLayout(
+                            #     
+                            #     sidebarPanel = NULL,
+                            #     mainPanel = mainPanel(
+                            #         tableOutput("Table16")
+                            #     )    
+                            #     
+                            # )
+                            fluidRow(
+                                column(width = 4,
+                                       h2("Ratio 1 "),
+                                       tableOutput("Table15")),
+                                column(width = 8,
+                                       h2("Ratio 2"),
+                                       tableOutput("Table16")),
                             )
                    ),
-                   
-                   tabPanel("3.6 Top 3 produits" ,
+                   #3.6
+                   tabPanel("Top 3 produits" ,
                             h1("Ratio (disp) :"),  
                             sidebarLayout(
                                 
@@ -258,18 +318,29 @@ shinyUI(fluidPage(
                                 
                             )
                    ),
+                   #3.7
+                   # tabPanel("Tonnes de céréales caculé  si les USA diminuaient leur production de produits animaux de 10%",
+                   #          h1("Des céréales pourraient être libérées :"),  
+                   #          sidebarLayout(
+                   #              
+                   #              sidebarPanel = NULL,
+                   #              mainPanel = mainPanel(
+                   #                  tableOutput("Table19")
+                   #              )    
+                   #          )
+                   # )
                    
-                   tabPanel("3.7 Tonnes de céréales caculé  si les USA diminuaient leur production de produits animaux de 10%",
-                            h1("Des céréales pourraient être libérées :"),  
+                   tabPanel("Map" ,
+                            h1(""),  
                             sidebarLayout(
                                 
                                 sidebarPanel = NULL,
                                 mainPanel = mainPanel(
-                                    tableOutput("Table19")
+                                    plotOutput("map")
                                 )    
+                                
                             )
                    )
-                   
                   
                     
                    
