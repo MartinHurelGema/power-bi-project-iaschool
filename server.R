@@ -362,43 +362,68 @@ shinyServer(function(input, output) {
     # }
     # 
     
-    output$map <- renderImage({
-        world <- geojsonio::geojson_read("json/world.geojson", what="sp")
+    output$map <- renderPlotly({
+        world <- rjson::fromJSON(file="json/world.geojson")
+        under_temp  <- read.csv("data_fao/undernourishment.csv")
+        under_temp$ratios <- under_temp$Suite.of.Food.Security.Indicators...Prevalence.of.undernourishment..percent...3.year.average....210041...Value...6121....
+        under_temp <- under_temp[!is.na(under_temp$ratios),] %>% group_by(Entity) %>% summarise(population=mean(ratios))
         
+        under_temp$NAME <- under_temp$Entity
+       
         
-        
-        url <- 'https://raw.githubusercontent.com/plotly/datasets/master/election.geojson'
-        geojson <- rjson::fromJSON(file=url)
-        url2<- "https://raw.githubusercontent.com/plotly/datasets/master/election.csv"
-        
-        df <- read.csv(url2)
-        g <- list(
-            fitbounds = "locations",
-            visible = FALSE
-        )
         fig <- plot_ly() 
         fig <- fig %>% add_trace(
             type="choroplethmapbox",
-            geojson=geojson,
-            locations=df$district,
-            z=df$Bergeron,
-            colorscale="Viridis",
-            featureidkey="properties.district"
+            geojson=world,
+            locations=under_temp$NAME,
+            z=under_temp$population,
+            colorscale="YlOrRd",
+            reversescale=TRUE,
+            featureidkey="properties.NAME"
         )
-        fig <- fig %>% colorbar(title = "Bergeron Votes")
+        fig <- fig %>% colorbar(title = "population ratio")
         fig <- fig %>% layout(
             mapbox=list(
                 style="carto-positron",
-                zoom =9,
-                center=list(lon=-73.7073, lat=45.5517))
+                zoom =1,
+                height = "100%",
+                width = "100%",
+                center=list(lat=30.3753, lon=69.3451))
         )
-        fig
         
+        fig
       
         
     })
     
     
+    output$map2 <- renderPlotly({
+        world <- rjson::fromJSON(file="json/world.geojson")
+        productions <- pivot_final[!is.na(pivot_final$Production),] %>% group_by(Area) %>% summarise(production=mean(Production))
+        names(productions)[names(productions) == "Area"] <- "NAME"
+        productions$NAME[productions$NAME == "United States of America"] <- "United States"
+        
+        fig <- plot_ly() 
+        fig <- fig %>% add_trace(
+            type="choroplethmapbox",
+            geojson=world,
+            locations=productions$NAME,
+            z=productions$production,
+            colorscale="Greens",
+            reversescale=TRUE,
+            featureidkey="properties.NAME"
+        )
+        fig <- fig %>% colorbar(title = "Production")
+        fig <- fig %>% layout(
+            mapbox=list(
+                style="carto-positron",
+                zoom =1,
+                center=list(lat=30.3753, lon=69.3451))
+        )
+        fig
+        
+        
+    })
     
     onSessionEnded(function(){
         stop_connection()    

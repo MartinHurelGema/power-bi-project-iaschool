@@ -330,13 +330,25 @@ shinyUI(fluidPage(
                    #          )
                    # )
                    
-                   tabPanel("Map" ,
-                            h1(""),  
+                   tabPanel("Map - Sous-nutrition" ,
+                            h1("Ratio de population en sous-nutrition :"),  
                             sidebarLayout(
                                 
                                 sidebarPanel = NULL,
                                 mainPanel = mainPanel(
-                                    plotOutput("map")
+                                    plotlyOutput("map", width = "100%", height = "100%")
+                                )    
+                                
+                            )
+                   ),
+                   
+                   tabPanel("Map - Production" ,
+                            h1("Production par millier de tonne :"),  
+                            sidebarLayout(
+                                
+                                sidebarPanel = NULL,
+                                mainPanel = mainPanel(
+                                    plotlyOutput("map2", width = "100%", height = "100%")
                                 )    
                                 
                             )
